@@ -1,0 +1,24 @@
+{
+  "name": "garlic/gateway",
+  "description": "Gateway bundle",
+  "keywords": ["GraphQL", "Gateway", "Microservices"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Alexandr Odarich",
+      "email": "aodarich@gmail.com"
+    }
+  ],
+  "type": "symfony-bundle",
+  "autoload": {
+    "psr-4": {
+      "Garlic\\Gateway\\": ""
+    }
+  },
+  "require": {
+    "php": ">=7.1",
+    "webonyx/graphql-php": "*",
+    "garlic/graphql-php-tools": "*",
+    "garlic/bus": "*"
+  }
+}
