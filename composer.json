@@ -1,6 +1,6 @@
 {
   "name": "garlic/gateway",
-  "description": "Gateway bundle",
+  "description": "Gateway Bundle provided to handle combined client query and delegate them to single microservice",
   "keywords": ["GraphQL", "Gateway", "Microservices"],
   "license": "MIT",
   "authors": [
@@ -19,6 +19,7 @@
     "php": ">=7.1",
     "webonyx/graphql-php": "*",
     "garlic/graphql-php-tools": "*",
-    "garlic/bus": "*"
+    "garlic/bus": "*",
+    "garlic/healthcheck": "*"
   }
 }
