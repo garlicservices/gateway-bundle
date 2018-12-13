@@ -200,6 +200,6 @@ class QueryProcessorService
      */
     private function prepareQuery($query)
     {
-        return $query.implode(' ', $this->queryFragments);
+        return $this->queryType.$query.implode(' ', $this->queryFragments);
     }
 }

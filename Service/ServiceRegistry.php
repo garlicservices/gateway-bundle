@@ -17,8 +17,6 @@ class ServiceRegistry
     {
         return [
             'notification',
-            'customer',
-            'template'
         ];
     }
 }

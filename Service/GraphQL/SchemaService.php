@@ -82,7 +82,7 @@ class SchemaService
     {
         // TODO: Create solution for getting and storing service schemas instead of test files
         
-        $source = file_get_contents(dirname(dirname(dirname(__FILE__)))."/Resources/$clientName.json");
+        $source = file_get_contents(dirname(dirname(dirname(__FILE__)))."/Resources/queries/$clientName.json");
         
         return BuildClientSchema::build(json_decode($source)->data);
     }
