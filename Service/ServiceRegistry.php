@@ -16,7 +16,7 @@ class ServiceRegistry
     public function getRegisteredServices(): array
     {
         return [
-            'notification',
+            'template',
         ];
     }
 }
