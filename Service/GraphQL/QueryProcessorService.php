@@ -174,7 +174,7 @@ class QueryProcessorService
                     $response = $this->communicatorService->send(
                         'graphql',
                         [],
-                        ['query' => $this->prepareQuery($query)]
+                        ['query' => $this->prepareQuery($query), 'variables' => $this->queryPayload['variables']]
                     );
                     // TODO : Response object should have method to get decoded data and errors
                     $responseContent = json_decode($response->getContent(), true);
