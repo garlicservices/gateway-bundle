@@ -14,12 +14,22 @@ class ResponseFormatterService
     private $data = [];
 
     /**
-     * @param string $service
      * @param $data
      */
-    public function setData(string $service, $data)
+    public function setData($data)
     {
-        $this->data[$service][] = $data;
+        foreach ($data as $service => $response) {
+            if ($response != null) {
+                if (isset($response['data'])) {
+                    $this->data[$service] = $response['data'];
+                }
+                if(isset($response['errors'])) {
+                    $this->errors[$service] = $response['errors'];
+                }
+            } else {
+                $this->data[$service] = $response;
+            }
+        }
     }
 
     /**

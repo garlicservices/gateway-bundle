@@ -169,27 +169,19 @@ class QueryProcessorService
 
                     return $result->toArray();
                 } else {
-                    $this->communicatorService->request($serviceName);
                     /** @var Response $response */
-                    $response = $this->communicatorService->send(
+                    $this->communicatorService->pool(
+                        $serviceName,
                         'graphql',
                         [],
                         ['query' => $this->prepareQuery($query), 'variables' => $this->queryPayload['variables']]
                     );
-                    // TODO : Response object should have method to get decoded data and errors
-                    $responseContent = json_decode($response->getContent(), true);
-                    if (isset($responseContent['errors'])) {
-                        foreach ($responseContent['errors'] as $error) {
-                            $this->responseService->setError($serviceName, $error['message']);
-                        }
-                    } else {
-                        $this->responseService->setData($serviceName, $responseContent['data']);
-                    }
                 }
             } catch (\Exception $e) {
                 $this->responseService->setError($serviceName, $e->getMessage(), $e->getCode());
             }
         }
+        $this->responseService->setData($this->communicatorService->fetch());
 
         return $this->responseService->response();
     }
