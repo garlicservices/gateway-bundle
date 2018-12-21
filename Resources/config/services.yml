@@ -8,11 +8,6 @@ services:
     Garlic\Gateway\Controller\:
         resource: '../../Controller'
         tags: ['controller.service_arguments']
-    # Convert all errors to JSON format
-    base.exception_subscriber:
-        class: App\EventSubscriber\ExceptionSubscriber
-        tags:
-            - { name: kernel.event_subscriber }
 
     gateway.command.health_check:
         public: true

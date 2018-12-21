@@ -5,7 +5,7 @@ namespace Garlic\Gateway\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\StatusHistoryRepository")
+ * @ORM\Entity(repositoryClass="Garlic\Gateway\Repository\StatusHistoryRepository")
  * @ORM\Table(name="gateway_service_status_history")
  */
 class StatusHistory
@@ -18,7 +18,7 @@ class StatusHistory
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Service", inversedBy="statusHistory")
+     * @ORM\ManyToOne(targetEntity="Garlic\Gateway\Entity\Service", inversedBy="statusHistory")
      * @ORM\JoinColumn(nullable=false)
      */
     private $service;

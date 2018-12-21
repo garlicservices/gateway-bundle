@@ -8,7 +8,7 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\ServiceRepository")
+ * @ORM\Entity(repositoryClass="Garlic\Gateway\Repository\ServiceRepository")
  * @ORM\Table(name="gateway_service")
  * @ORM\HasLifecycleCallbacks()
  */
@@ -54,7 +54,7 @@ class Service
     private $lastTiming;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\StatusHistory", mappedBy="service", orphanRemoval=true, cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="Garlic\Gateway\Entity\StatusHistory", mappedBy="service", orphanRemoval=true, cascade={"persist"})
      */
     private $statusHistory;
 
