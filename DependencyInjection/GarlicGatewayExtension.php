@@ -32,6 +32,14 @@ class GarlicGatewayExtension extends Extension implements PrependExtensionInterf
      */
     public function prepend(ContainerBuilder $container)
     {
-
+        $config = [
+            'clients' => [
+                'default' => [
+                    '$options' => [],
+                    '$parameters' => ['tcp://'.getenv('REDIS_HOST').':'.getenv('REDIS_PORT').'?database=3'],
+                ],
+            ],
+        ];
+        $container->prependExtensionConfig('sb_redis', $config);
     }
 }

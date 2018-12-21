@@ -117,43 +117,53 @@ class QueryProcessorService
      */
     public function processQuery()
     {
-        $this->getQueryPayload();
-        $documentNode = Parser::parse(new Source($this->queryPayload['query'] ?: '', 'GraphQL'));
-        $validate = DocumentValidator::validate($this->schemaService->getSchema(), $documentNode);
+        try {
+            $this->getQueryPayload();
+            $documentNode = Parser::parse(new Source($this->queryPayload['query'] ?: '', 'GraphQL'));
+            $validate = DocumentValidator::validate($this->schemaService->getSchema(), $documentNode);
 
-        if (!empty($validate)) {
-            foreach ($validate as $error) {
-                $this->responseService->setError('graphql', $error->getMessage(), $error->getCode());
+            if (!empty($validate)) {
+                foreach ($validate as $error) {
+                    $this->responseService->setError('graphql', $error->getMessage(), $error->getCode());
+                }
+
+                return $this->responseService->response();
             }
 
-            return $this->responseService->response();
-        }
+            if ($documentNode instanceof DocumentNode) {
 
-        if ($documentNode instanceof DocumentNode) {
-
-            foreach ($documentNode->definitions as $definition) {
-                /** @var DefinitionNode $definition */
-                switch ($definition->kind) {
-                    case NodeKind::OPERATION_DEFINITION:
-                        $this->queryType = $definition->operation;
-                        /** @var SelectionSetNode $selectionSet */
-                        $selectionSet = $definition->selectionSet;
-                        foreach ($selectionSet->selections as $selection) {
-                            /** @var FieldNode $selection */
-                            if (in_array($selection->name->value, $this->registryService->getRegisteredServices())) {
+                foreach ($documentNode->definitions as $definition) {
+                    /** @var DefinitionNode $definition */
+                    switch ($definition->kind) {
+                        case NodeKind::OPERATION_DEFINITION:
+                            $this->queryType = $definition->operation;
+                            /** @var SelectionSetNode $selectionSet */
+                            $selectionSet = $definition->selectionSet;
+                            foreach ($selectionSet->selections as $selection) {
+                                /** @var FieldNode $selection */
+                                if (in_array(
+                                    $selection->name->value,
+                                    $this->registryService->getRegisteredServices()
+                                )) {
+                                    $this->querySplit[$selection->name->value] = Printer::doPrint(
+                                        $selection->selectionSet
+                                    );
+                                }
                                 $this->querySplit[$selection->name->value] = Printer::doPrint($selection->selectionSet);
                             }
-                            $this->querySplit[$selection->name->value] = Printer::doPrint($selection->selectionSet);
-                        }
-                        break;
-                    case NodeKind::FRAGMENT_DEFINITION:
-                        $this->queryFragments[] = Printer::doPrint($definition);
-                        break;
+                            break;
+                        case NodeKind::FRAGMENT_DEFINITION:
+                            $this->queryFragments[] = Printer::doPrint($definition);
+                            break;
+                    }
                 }
             }
+            $this->sendRequest();
+        } catch (\Exception $error) {
+            $this->responseService->setError('graphql', $error->getMessage(), $error->getCode());
         }
 
-        return $this->sendRequest();
+        return $this->responseService->response();
     }
 
     /**
@@ -182,8 +192,6 @@ class QueryProcessorService
             }
         }
         $this->responseService->setData($this->communicatorService->fetch());
-
-        return $this->responseService->response();
     }
 
     /**

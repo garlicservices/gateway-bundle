@@ -3,30 +3,44 @@
 namespace Garlic\Gateway\Service\GraphQL;
 
 use Garlic\Gateway\Service\ServiceRegistry;
+use GraphQL\GraphQL;
 use GraphQL\Type\Schema;
 use Ola\Tools\BuildClientSchema;
+use Ola\Tools\MergeInfo;
 use Ola\Tools\MergeSchemas;
+use Symfony\Component\HttpKernel\Config\FileLocator;
+use SymfonyBundles\RedisBundle\Redis\ClientInterface;
 
-/**
- * Class SchemaService
- * @package Garlic\Gateway\Service\GraphQL
- */
 class SchemaService
 {
+    protected $schemaKey = '_garlic_schema';
+
     /**
      * @var ServiceRegistry
      */
     private $serviceRegistry;
-    
+    /**
+     * @var ClientInterface
+     */
+    private $redis;
+    private $fileLocator;
+
     /**
      * SchemaService constructor.
      * @param ServiceRegistry $serviceRegistry
+     * @param ClientInterface $redis
+     * @param FileLocator $fileLocator
      */
-    public function __construct(ServiceRegistry $serviceRegistry)
-    {
+    public function __construct(
+        ServiceRegistry $serviceRegistry,
+        ClientInterface $redis,
+        FileLocator $fileLocator
+    ) {
         $this->serviceRegistry = $serviceRegistry;
+        $this->redis = $redis;
+        $this->fileLocator = $fileLocator;
     }
-    
+
     /**
      * Returns whole schema of all registered services
      *
@@ -35,30 +49,28 @@ class SchemaService
      */
     public function getSchema(): Schema
     {
-        return $this->makeSchema(
-            $this->serviceRegistry->getRegisteredServices()
-        );
+        return BuildClientSchema::build(\json_decode($this->redis->get($this->getSchemaKey()))->data);
     }
-    
+
     /**
-     * Generates schema for all registered services
+     * Generates big schema for all registered services
      *
-     * @param array $serviceNames
      * @return mixed
      * @throws \Exception
      */
-    private function makeSchema(array $serviceNames)
+    public function rebuildSchema()
     {
+        $serviceNames = $this->serviceRegistry->getRegisteredServices();
         $serviceSchemas = [];
         foreach ($serviceNames as $name) {
             $serviceSchemas[$name] = $this->getClientSchema($name);
         }
-        
+
         return $this->mergeSchemas($serviceSchemas);
     }
-    
+
     /**
-     * Merge multipluservice schemas to big one
+     * Merge service schemas to big one
      *
      * @param array $schemas
      * @return mixed
@@ -66,12 +78,25 @@ class SchemaService
      */
     private function mergeSchemas(array $schemas)
     {
-        return MergeSchemas::mergeSchemas(
+        $finalSchema = MergeSchemas::mergeSchemas(
             $schemas,
             false
         );
+
+        $result = GraphQL::executeQuery(
+            $finalSchema,
+            file_get_contents(
+                $this->fileLocator->locate('@HealthCheckBundle/Resources/query/introspection.graphql')
+            )
+        );
+
+        $json = \json_encode($result->toArray());
+
+        $this->redis->set($this->getSchemaKey(), $json);
+
+        return $result;
     }
-    
+
     /**
      * Get Introspection query and generate schema file based on it
      *
@@ -80,11 +105,18 @@ class SchemaService
      */
     private function getClientSchema(string $clientName): Schema
     {
-        // TODO: Create solution for getting and storing service schemas instead of test files
-        
-        $source = file_get_contents(dirname(dirname(dirname(__FILE__)))."/Resources/queries/$clientName.json");
-        
-        return BuildClientSchema::build(json_decode($source)->data);
+        $payload = $this->redis->get($clientName);
+
+        return BuildClientSchema::build(json_decode($payload)->data);
     }
 
+    /**
+     * Schema key to be stored in Redis
+     *
+     * @return string
+     */
+    public function getSchemaKey()
+    {
+        return $this->schemaKey;
+    }
 }

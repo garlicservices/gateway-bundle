@@ -20,6 +20,7 @@
     "webonyx/graphql-php": "*",
     "garlic/graphql-php-tools": "1.*",
     "garlic/bus": "1.*",
-    "garlic/healthcheck": "1.*"
+    "garlic/healthcheck": "1.*",
+    "symfony-bundles/redis-bundle": "^2.2"
   }
 }
