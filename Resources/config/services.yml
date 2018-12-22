@@ -1,3 +1,6 @@
+parameters:
+  gateway_route: '%env(GATEWAY_ROUTE, "main")%'
+
 services:
     _defaults:
         autowire: true
@@ -19,5 +22,5 @@ services:
         tags:
             - { name: 'console.command' }
     Garlic\Gateway\:
-        resource: '../*'
-        exclude: '../{Entity,Migrations,Tests}'
+        resource: '../../*'
+        exclude: '../../{Entity,Migrations,Tests}'
