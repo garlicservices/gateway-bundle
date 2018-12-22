@@ -42,10 +42,15 @@ class ServiceRepository extends ServiceEntityRepository
 
         $service->setLastTiming(round($timing, 4));
 
-        $service->setEnabled(in_array($status, [
-            Service::STATUS_NEW,
-            Service::STATUS_OK,
-        ]));
+        $service->setEnabled(
+            in_array(
+                $status,
+                [
+                    Service::STATUS_NEW,
+                    Service::STATUS_OK,
+                ]
+            )
+        );
         $service->setLastHealthCheckAt(new \DateTime('now'));
 
         $this->_em->persist($service);
@@ -62,15 +67,17 @@ class ServiceRepository extends ServiceEntityRepository
     {
         $data = $this->createQueryBuilder('s')
             ->select('s.name')
-            ->where('s.lastHealthCheckAt >= :last_heart_beat')
-            ->where('s.name != "gateway"') // gateway didn't store any schema itself
+            ->where('s.lastHealthCheckAt >= :last_heart_beat and s.name != :gateway')
             ->setParameter('last_heart_beat', (new \DateTime('-1 minute')))
+            ->setParameter('gateway', "gateway")
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
 
-        return array_map(function ($x) use ($data) {
-            return $x['name'];
-        }, $data);
+        return array_map(
+            function ($x) use ($data) {
+                return $x['name'];
+            },
+            $data
+        );
     }
 }

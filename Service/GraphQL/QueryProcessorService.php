@@ -176,8 +176,8 @@ class QueryProcessorService
             try {
                 if ($serviceName == Introspection::SCHEMA_FIELD_NAME) {
                     $result = GraphQL::executeQuery($this->schemaService->getSchema(), $this->queryPayload['query']);
-
-                    return $result->toArray();
+                    $schema = $result->toArray();
+                    $this->responseService->setData([Introspection::SCHEMA_FIELD_NAME => $schema['data'][Introspection::SCHEMA_FIELD_NAME]]);
                 } else {
                     /** @var Response $response */
                     $this->communicatorService->pool(
@@ -191,7 +191,7 @@ class QueryProcessorService
                 $this->responseService->setError($serviceName, $e->getMessage(), $e->getCode());
             }
         }
-        $this->responseService->setData($this->communicatorService->fetch());
+        return $this->responseService->setData($this->communicatorService->fetch());
     }
 
     /**

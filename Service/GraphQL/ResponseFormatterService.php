@@ -2,6 +2,7 @@
 
 namespace Garlic\Gateway\Service\GraphQL;
 
+use GraphQL\Type\Introspection;
 /**
  * Class ResponseFormatterService
  * @package Garlic\Gateway\Service\GraphQL
@@ -19,7 +20,7 @@ class ResponseFormatterService
     public function setData($data)
     {
         foreach ($data as $service => $response) {
-            if ($response != null) {
+            if ($response != null  && $service != Introspection::SCHEMA_FIELD_NAME) {
                 if (isset($response['data'])) {
                     $this->data[$service] = $response['data'];
                 }

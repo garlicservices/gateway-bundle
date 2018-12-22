@@ -36,7 +36,7 @@ class GarlicGatewayExtension extends Extension implements PrependExtensionInterf
             'clients' => [
                 'default' => [
                     '$options' => [],
-                    '$parameters' => ['tcp://'.getenv('REDIS_HOST').':'.getenv('REDIS_PORT').'?database=3'],
+                    '$parameters' => ['tcp://'.getenv('REDIS_HOST').':'.getenv('REDIS_PORT')],
                 ],
             ],
         ];

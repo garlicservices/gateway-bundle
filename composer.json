@@ -21,6 +21,7 @@
     "garlic/graphql-php-tools": "1.*",
     "garlic/bus": "1.*",
     "garlic/healthcheck": "1.*",
-    "symfony-bundles/redis-bundle": "^2.2"
+    "symfony-bundles/redis-bundle": "^2.2",
+    "doctrine/doctrine-bundle": "^1.9"
   }
 }

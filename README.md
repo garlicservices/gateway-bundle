@@ -5,7 +5,8 @@ The gateway bundle adds support of merging multiply GraphQL schemas to single st
 Features include:
 - Documentation from multiply microservices in single place
 - Validation on the gateway layer
-- Split and process requests for single microservice
+- Split and process requests for multiply microservices
+- Service discovery
 
 Installation
 ------------
@@ -18,38 +19,6 @@ With [composer](https://getcomposer.org), require:
 Usage
 -----
 
-```php 
-class DefaultController extends AbstractController
-{
-    private $queryProcessor;
-    /**
-     * DefaultController constructor.
-     * @param QueryProcessorService $queryProcessor
-     */
-    public function __construct(QueryProcessorService $queryProcessor)
-    {
-        $this->queryProcessor = $queryProcessor;
-    }
-
-    public function index()
-    {
-        try {
-            $output = $this->queryProcessor->processQuery();
-            $code = JsonResponse::HTTP_OK;
-        } catch (\Exception $e) {
-            $output = [
-                'error' => [
-                    'message' => $e->getMessage()
-                ]
-            ];
-            $code = JsonResponse::HTTP_BAD_REQUEST;
-        }
-
-        return new JsonResponse(
-            $output,
-            $code
-        );
-    }
-}
-
-```
+Just install latest version of gateway bundle and add environment variables REDIS_HOST, REDIS_PORT to .env file to
+schema caching. 
+Gateway service will be available at "/main" route.

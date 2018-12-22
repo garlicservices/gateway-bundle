@@ -18,3 +18,6 @@ services:
         public: true
         tags:
             - { name: 'console.command' }
+    Garlic\Gateway\:
+        resource: '../*'
+        exclude: '../{Entity,Migrations,Tests}'
