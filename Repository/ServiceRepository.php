@@ -20,44 +20,6 @@ class ServiceRepository extends ServiceEntityRepository
     }
 
     /**
-     * Update service status
-     *
-     * @param string $serviceName
-     * @param int $status
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Exception
-     */
-    public function updateServiceStatus(string $serviceName, int $status, $timing)
-    {
-        $service = $this->_em->getRepository(Service::class)
-            ->findOneBy(['name' => $serviceName]);
-
-        if (!$service) {
-            $service = new Service();
-            $service->setName($serviceName);
-        } else {
-            $service->setStatus($status);
-        }
-
-        $service->setLastTiming(round($timing, 4));
-
-        $service->setEnabled(
-            in_array(
-                $status,
-                [
-                    Service::STATUS_NEW,
-                    Service::STATUS_OK,
-                ]
-            )
-        );
-        $service->setLastHealthCheckAt(new \DateTime('now'));
-
-        $this->_em->persist($service);
-        $this->_em->flush();
-    }
-
-    /**
      * Get active services list
      *
      * @return array
