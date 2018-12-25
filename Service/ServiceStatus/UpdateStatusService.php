@@ -3,21 +3,6 @@
 namespace Garlic\Gateway\Service\ServiceStatus;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Garlic\Bus\Entity\Response;
-use Garlic\Bus\Service\CommunicatorService;
-use Garlic\Gateway\Service\ServiceRegistry;
-use GraphQL\GraphQL;
-use GraphQL\Language\AST\DefinitionNode;
-use GraphQL\Language\AST\DocumentNode;
-use GraphQL\Language\AST\FieldNode;
-use GraphQL\Language\AST\NodeKind;
-use GraphQL\Language\AST\SelectionSetNode;
-use GraphQL\Language\Parser;
-use GraphQL\Language\Printer;
-use GraphQL\Language\Source;
-use GraphQL\Type\Introspection;
-use GraphQL\Validator\DocumentValidator;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Garlic\Gateway\Entity\Service;
 
 /**
@@ -75,6 +60,8 @@ class UpdateStatusService
 
         $this->em->persist($service);
         $this->em->flush();
+
+        return $service;
     }
 
 }
