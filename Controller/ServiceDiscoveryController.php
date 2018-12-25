@@ -6,6 +6,7 @@ use Garlic\Gateway\Entity\Service;
 use Garlic\Gateway\Service\GraphQL\SchemaService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Garlic\Gateway\Service\ServiceStatus\UpdateStatusService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,9 +20,9 @@ class ServiceDiscoveryController extends AbstractController
      */
     private $schemaService;
     /**
-     * @var EntityManager
+     * @var UpdateStatusService
      */
-    private $em;
+    private $service;
     /**
      * @var ClientInterface
      */
@@ -30,16 +31,16 @@ class ServiceDiscoveryController extends AbstractController
     /**
      * DefaultController constructor.
      * @param SchemaService $schemaService
-     * @param EntityManagerInterface $em,
+     * @param UpdateStatusService $service
      * @param ClientInterface $redis
      */
     public function __construct(
         SchemaService $schemaService,
-        EntityManagerInterface $em,
+        UpdateStatusService $service,
         ClientInterface $redis
     ) {
         $this->schemaService = $schemaService;
-        $this->em = $em;
+        $this->service = $service;
         $this->redis = $redis;
     }
 
@@ -56,8 +57,7 @@ class ServiceDiscoveryController extends AbstractController
     {
         $name = $request->request->get('name');
 
-        $this->em->getRepository(Service::class)
-            ->updateServiceStatus($name, Service::STATUS_OK, $request->request->get('timing'));
+        $this->service->updateServiceStatus($name, Service::STATUS_OK, $request->request->get('timing'));
 
         $this->redis->set($name, $request->request->get('data'));
 

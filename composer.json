@@ -23,5 +23,8 @@
     "garlic/healthcheck": "1.*",
     "symfony-bundles/redis-bundle": "^2.2",
     "doctrine/doctrine-bundle": "^1.9"
+  },
+  "require-dev": {
+    "symfony/phpunit-bridge": "^4.2"
   }
 }
