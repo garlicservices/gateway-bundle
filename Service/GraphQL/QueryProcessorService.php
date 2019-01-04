@@ -42,6 +42,8 @@ class QueryProcessorService
     private $registryService;
     /** @var \Symfony\Component\HttpFoundation\Request|null */
     private $request;
+    /** @var string $variableDefinitions */
+    private $variableDefinitions;
 
     /**
      * QueryProcessorService constructor.
@@ -136,6 +138,14 @@ class QueryProcessorService
                     /** @var DefinitionNode $definition */
                     switch ($definition->kind) {
                         case NodeKind::OPERATION_DEFINITION:
+                            $variableDefinitions = Printer::doPrint($definition->variableDefinitions);
+                            if ($variableDefinitions) {
+                                $this->variableDefinitions .= '(';
+                                foreach ($variableDefinitions as $node) {
+                                    $this->variableDefinitions .= $node.',';
+                                }
+                                $this->variableDefinitions .= ')';
+                            }
                             $this->queryType = $definition->operation;
                             /** @var SelectionSetNode $selectionSet */
                             $selectionSet = $definition->selectionSet;
@@ -177,20 +187,27 @@ class QueryProcessorService
                 if ($serviceName == Introspection::SCHEMA_FIELD_NAME) {
                     $result = GraphQL::executeQuery($this->schemaService->getSchema(), $this->queryPayload['query']);
                     $schema = $result->toArray();
-                    $this->responseService->setData([Introspection::SCHEMA_FIELD_NAME => $schema['data'][Introspection::SCHEMA_FIELD_NAME]]);
+
+                    return $this->responseService->setData(
+                        [Introspection::SCHEMA_FIELD_NAME => $schema['data'][Introspection::SCHEMA_FIELD_NAME]]
+                    );
                 } else {
                     /** @var Response $response */
                     $this->communicatorService->pool(
                         $serviceName,
                         'graphql',
                         [],
-                        ['query' => $this->prepareQuery($query), 'variables' => $this->queryPayload['variables']]
+                        [
+                            'query' => $this->prepareQuery($query),
+                            'variables' => json_encode($this->queryPayload['variables']),
+                        ]
                     );
                 }
             } catch (\Exception $e) {
                 $this->responseService->setError($serviceName, $e->getMessage(), $e->getCode());
             }
         }
+
         return $this->responseService->setData($this->communicatorService->fetch());
     }
 
@@ -200,6 +217,6 @@ class QueryProcessorService
      */
     private function prepareQuery($query)
     {
-        return $this->queryType.$query.implode(' ', $this->queryFragments);
+        return $this->queryType.$this->variableDefinitions.$query.implode(' ', $this->queryFragments);
     }
 }
