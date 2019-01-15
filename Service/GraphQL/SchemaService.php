@@ -6,8 +6,8 @@ use Garlic\Gateway\Service\ServiceRegistry;
 use GraphQL\GraphQL;
 use GraphQL\Type\Schema;
 use Ola\GraphQL\Tools\BuildClientSchema;
-use Ola\Tools\MergeInfo;
-use Ola\Tools\MergeSchemas;
+use Ola\GraphQL\Tools\MergeInfo;
+use Ola\GraphQL\Tools\MergeSchemas;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use SymfonyBundles\RedisBundle\Redis\ClientInterface;
 
