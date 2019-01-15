@@ -5,7 +5,7 @@ namespace Garlic\Gateway\Service\GraphQL;
 use Garlic\Gateway\Service\ServiceRegistry;
 use GraphQL\GraphQL;
 use GraphQL\Type\Schema;
-use Ola\Tools\BuildClientSchema;
+use Ola\GraphQL\Tools\BuildClientSchema;
 use Ola\Tools\MergeInfo;
 use Ola\Tools\MergeSchemas;
 use Symfony\Component\HttpKernel\Config\FileLocator;
