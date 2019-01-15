@@ -15,45 +15,55 @@ class ResponseFormatterService
     private $data = [];
 
     /**
+     * Set service response data
+     *
+     * @param $service
      * @param $data
      */
-    public function setData($data)
+    public function setData($service, $data)
     {
-        foreach ($data as $service => $response) {
-            if ($response != null  && $service != Introspection::SCHEMA_FIELD_NAME) {
-                if (isset($response['data'])) {
-                    $this->data[$service] = $response['data'];
-                }
-                if(isset($response['errors'])) {
-                    $this->errors[$service] = $response['errors'];
-                }
-            } else {
-                $this->data[$service] = $response;
+        if ($data != null && $service != Introspection::SCHEMA_FIELD_NAME) {
+            if (isset($data['data'])) {
+                $this->data[$service] = $data['data'];
             }
+            if (isset($data['errors'])) {
+                foreach ($data['errors'] as $error) {
+                    $message = isset($error['message']) ? $error['message'] : '';
+                    $code = isset($error['statusCode']) ? $error['statusCode'] : 400;
+                    $this->setError($service, $message, $code);
+                }
+            }
+        } else {
+            $this->data[$service] = $data;
         }
     }
 
     /**
+     * Set service error
+     *
      * @param string $service
      * @param string $message
      * @param int $code
      */
     public function setError(string $service, string $message, $code = 400)
     {
-        $this->errors[$service][] = [
+        $this->errors[] = [
             'message' => $message,
-            'code' => $code
+            'statusCode' => $code,
+            'path' => [$service],
         ];
     }
 
     /**
+     * Get query response
+     *
      * @return array
      */
     public function response()
     {
         return [
             'data' => $this->data,
-            'errors' => $this->errors
+            'errors' => $this->errors,
         ];
     }
 }

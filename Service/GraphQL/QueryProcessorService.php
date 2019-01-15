@@ -177,7 +177,6 @@ class QueryProcessorService
     }
 
     /**
-     * @return array
      * @throws \Exception
      */
     private function sendRequest()
@@ -208,7 +207,15 @@ class QueryProcessorService
             }
         }
 
-        return $this->responseService->setData($this->communicatorService->fetch());
+        /** @var $response Response[] */
+        $responses = $this->communicatorService->fetch();
+
+        foreach ($responses as $service => $response) {
+            if ($response->getCode() >= 400) {
+                $this->responseService->setError($service, 'Request is invalid.', $response->getCode());
+            }
+            $this->responseService->setData($service, $response->getData());
+        }
     }
 
     /**
