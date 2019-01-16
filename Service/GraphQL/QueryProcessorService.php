@@ -188,7 +188,8 @@ class QueryProcessorService
                     $schema = $result->toArray();
 
                     return $this->responseService->setData(
-                        [Introspection::SCHEMA_FIELD_NAME => $schema['data'][Introspection::SCHEMA_FIELD_NAME]]
+                        Introspection::SCHEMA_FIELD_NAME,
+                        $schema['data'][Introspection::SCHEMA_FIELD_NAME]
                     );
                 } else {
                     /** @var Response $response */
