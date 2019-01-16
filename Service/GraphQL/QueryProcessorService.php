@@ -187,7 +187,10 @@ class QueryProcessorService
                     $result = GraphQL::executeQuery($this->schemaService->getSchema(), $this->queryPayload['query']);
                     $schema = $result->toArray();
 
-                    return $this->responseService->setData(Introspection::SCHEMA_FIELD_NAME, $schema['data'][Introspection::SCHEMA_FIELD_NAME]);
+                    return $this->responseService->setData(
+                        Introspection::SCHEMA_FIELD_NAME,
+                        $schema['data'][Introspection::SCHEMA_FIELD_NAME]
+                    );
                 } else {
                     /** @var Response $response */
                     $this->communicatorService->pool(
