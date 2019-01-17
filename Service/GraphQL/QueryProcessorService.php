@@ -213,7 +213,11 @@ class QueryProcessorService
 
         foreach ($responses as $service => $response) {
             if ($response->getCode() >= 400) {
-                $this->responseService->setError($service, 'Request is invalid.', $response->getCode());
+                $this->responseService->setError(
+                    $service,
+                    !empty($response->getContent()) ? $response->getContent() : 'Something went wrong.',
+                    $response->getCode()
+                );
             }
             $this->responseService->setData($service, $response->getData());
         }
