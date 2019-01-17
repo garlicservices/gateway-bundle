@@ -215,7 +215,7 @@ class QueryProcessorService
             if ($response->getCode() >= 400) {
                 $this->responseService->setError(
                     $service,
-                    !empty($response->getContent()) ? $response->getContent() : 'Request is invalid.',
+                    !empty($response->getContent()) ? $response->getContent() : 'Something went wrong.',
                     $response->getCode()
                 );
             }
