@@ -42,8 +42,8 @@ class QueryProcessorService
     private $registryService;
     /** @var \Symfony\Component\HttpFoundation\Request|null */
     private $request;
-    /** @var string $variableDefinitions */
-    private $variableDefinitions;
+    /** @var array $variableDefinitions */
+    private $variableDefinitions = [];
 
     /**
      * QueryProcessorService constructor.
@@ -140,11 +140,9 @@ class QueryProcessorService
                         case NodeKind::OPERATION_DEFINITION:
                             $variableDefinitions = Printer::doPrint($definition->variableDefinitions);
                             if ($variableDefinitions) {
-                                $this->variableDefinitions .= '(';
                                 foreach ($variableDefinitions as $node) {
-                                    $this->variableDefinitions .= $node.',';
+                                    $this->variableDefinitions[] = $node;
                                 }
-                                $this->variableDefinitions .= ')';
                             }
                             $this->queryType = $definition->operation;
                             /** @var SelectionSetNode $selectionSet */
@@ -199,7 +197,7 @@ class QueryProcessorService
                         [],
                         [
                             'query' => $this->prepareQuery($query),
-                            'variables' => json_encode($this->queryPayload['variables']),
+                            'variables' => $this->prepareVariables($query),
                         ]
                     );
                 }
@@ -224,11 +222,50 @@ class QueryProcessorService
     }
 
     /**
+     * Prepare query
+     *
      * @param $query
      * @return string
      */
     private function prepareQuery($query)
     {
-        return $this->queryType.$this->variableDefinitions.$query.implode(' ', $this->queryFragments);
+        return $this->queryType.$this->prepareDefinitions($query).$query.implode(' ', $this->queryFragments);
+    }
+
+    /**
+     * Prepare variables for query
+     *
+     * @param $query
+     * @return string
+     */
+    private function prepareVariables($query)
+    {
+        $variables = [];
+        foreach ($this->queryPayload['variables'] as $key => $variable) {
+            if (strpos($query, '$'.$key)) {
+                $variables[$key] = $variable;
+            }
+        }
+
+        return json_encode($variables);
+    }
+
+    /**
+     * Prepare definitions for query
+     *
+     * @param $query
+     * @return string
+     */
+    private function prepareDefinitions($query)
+    {
+        $definitions = '';
+        foreach ($this->variableDefinitions as $definition) {
+            $key = explode(':', $definition);
+            if (strpos($query, $key[0])) {
+                $definitions .= $definition.',';
+            }
+        }
+
+        return !empty($definitions) ? ('('.$definitions.')') : '';
     }
 }
