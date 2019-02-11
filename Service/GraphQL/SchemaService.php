@@ -4,6 +4,7 @@ namespace Garlic\Gateway\Service\GraphQL;
 
 use Garlic\Gateway\Service\ServiceRegistry;
 use GraphQL\GraphQL;
+use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Schema;
 use Ola\GraphQL\Tools\BuildClientSchema;
 use Ola\GraphQL\Tools\MergeInfo;
@@ -80,7 +81,14 @@ class SchemaService
     {
         $finalSchema = MergeSchemas::mergeSchemas(
             $schemas,
-            false
+            false,
+            function ($leftType, $rightType) {
+                if ($leftType instanceof ScalarType) {
+                    return $leftType;
+                } else {
+                    throw new \Error("Type name conflict: \"$leftType->name\"");
+                }
+            }
         );
 
         $result = GraphQL::executeQuery(
