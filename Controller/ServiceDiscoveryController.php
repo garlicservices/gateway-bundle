@@ -1,5 +1,5 @@
 <?php
-    
+
 namespace Garlic\Gateway\Controller;
 
 use Garlic\Gateway\Entity\Service;
@@ -27,7 +27,7 @@ class ServiceDiscoveryController extends AbstractController
      * @var ClientInterface
      */
     private $redis;
-    
+
     /**
      * DefaultController constructor.
      * @param SchemaService $schemaService
@@ -55,13 +55,17 @@ class ServiceDiscoveryController extends AbstractController
      */
     public function index(Request $request)
     {
-        $name = $request->request->get('name');
+        try {
+            $name = $request->request->get('name');
 
-        $this->service->updateServiceStatus($name, Service::STATUS_OK, $request->request->get('timing'));
+            $this->service->updateServiceStatus($name, Service::STATUS_OK, $request->request->get('timing'));
 
-        $this->redis->set($name, $request->request->get('data'));
+            $this->redis->set($name, $request->request->get('data'));
 
-        $this->schemaService->rebuildSchema();
+            $this->schemaService->rebuildSchema();
+        } catch (\Throwable $error) {
+            return JsonResponse::create($error, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
         return JsonResponse::create([]);
     }
