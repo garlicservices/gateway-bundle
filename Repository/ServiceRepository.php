@@ -30,7 +30,7 @@ class ServiceRepository extends ServiceEntityRepository
         $data = $this->createQueryBuilder('s')
             ->select('s.name')
             ->where('s.lastHealthCheckAt >= :last_heart_beat and s.name != :gateway')
-            ->setParameter('last_heart_beat', (new \DateTime('-1 minute')))
+            ->setParameter('last_heart_beat', (new \DateTime('-2 minute')))
             ->setParameter('gateway', "gateway")
             ->getQuery()
             ->getResult();
