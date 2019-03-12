@@ -64,7 +64,7 @@ class ServiceDiscoveryController extends AbstractController
 
             $this->schemaService->rebuildSchema();
         } catch (\Throwable $error) {
-            return JsonResponse::create($error, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+            return JsonResponse::create($error->getMessage() . PHP_EOL . $error->getTraceAsString(), JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return JsonResponse::create([]);
