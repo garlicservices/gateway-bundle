@@ -83,7 +83,10 @@ class SchemaService
             $schemas,
             false,
             function ($leftType, $rightType) {
-                if ($leftType instanceof ScalarType) {
+                if ($leftType instanceof ScalarType || in_array(
+                        $leftType->name,
+                        ['PagingParams', 'SortingOrder', 'PagingInfo']
+                    )) {
                     return $leftType;
                 } else {
                     throw new \Error("Type name conflict: \"$leftType->name\"");
