@@ -131,7 +131,7 @@ class QueryProcessorService
 
                 return $this->responseService->response();
             }
-
+            $this->communicatorService->handleFilesFromRequest();
             if ($documentNode instanceof DocumentNode) {
 
                 foreach ($documentNode->definitions as $definition) {
